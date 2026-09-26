@@ -1,0 +1,8 @@
+node_modules/
+dist/
+out/
+out-webview/
+media/dist/
+*.vsix
+.vscode-test/
+*.log

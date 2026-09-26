@@ -1,0 +1,212 @@
+{
+  "name": "latex-view",
+  "displayName": "LaTeX View",
+  "description": "Live HTML preview, PDF export (local TeX or bundled WASM), and an editable margins UI for LaTeX documents.",
+  "version": "0.0.1",
+  "publisher": "KadenMai",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KadenMai/LateX.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KadenMai/LateX/issues"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Visualization"
+  ],
+  "keywords": [
+    "latex",
+    "tex",
+    "pdf",
+    "preview",
+    "katex",
+    "math",
+    "geometry"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "languages": [
+      {
+        "id": "latex",
+        "extensions": [
+          ".tex",
+          ".sty",
+          ".cls",
+          ".ltx"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "latex-view.openHtmlPreview",
+        "title": "Open HTML Preview",
+        "category": "LaTeX View"
+      },
+      {
+        "command": "latex-view.openHtmlPreviewToSide",
+        "title": "Open HTML Preview to the Side",
+        "category": "LaTeX View"
+      },
+      {
+        "command": "latex-view.exportPdf",
+        "title": "Export as PDF",
+        "category": "LaTeX View"
+      },
+      {
+        "command": "latex-view.editMargins",
+        "title": "Edit Margins",
+        "category": "LaTeX View"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "latex-view.openHtmlPreviewToSide",
+          "when": "resourceLangId == latex",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "latex-view.openHtmlPreview",
+          "when": "resourceLangId == latex"
+        },
+        {
+          "command": "latex-view.openHtmlPreviewToSide",
+          "when": "resourceLangId == latex"
+        },
+        {
+          "command": "latex-view.exportPdf",
+          "when": "resourceLangId == latex"
+        },
+        {
+          "command": "latex-view.editMargins",
+          "when": "resourceLangId == latex"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "LaTeX View",
+      "properties": {
+        "latex-view.pdf.engine.preference": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "local",
+            "wasm"
+          ],
+          "default": "auto",
+          "description": "Which PDF engine to use: auto-detect local TeX and fall back to the bundled WASM engine, force local TeX, or force the bundled WASM engine."
+        },
+        "latex-view.pdf.engine.localCommand": {
+          "type": "string",
+          "enum": [
+            "latexmk",
+            "pdflatex",
+            "xelatex",
+            "lualatex"
+          ],
+          "default": "latexmk",
+          "description": "Preferred local TeX command used to compile PDFs."
+        },
+        "latex-view.pdf.localTexPath": {
+          "type": "string",
+          "default": "",
+          "description": "Optional directory to prepend to PATH when looking for a local TeX distribution."
+        },
+        "latex-view.pdf.outputDirectory": {
+          "type": "string",
+          "default": "",
+          "description": "Optional directory for compiled PDF output. Defaults to a temporary workspace-storage directory."
+        },
+        "latex-view.pdf.cleanAuxFiles": {
+          "type": "boolean",
+          "default": true,
+          "description": "Delete auxiliary compile files (.aux, .log, .out, etc.) after a successful PDF export."
+        },
+        "latex-view.pdf.compileTimeoutMs": {
+          "type": "number",
+          "default": 60000,
+          "description": "Maximum time in milliseconds to wait for a PDF compile before it is cancelled."
+        },
+        "latex-view.preview.debounceMs": {
+          "type": "number",
+          "default": 300,
+          "description": "Delay in milliseconds before the HTML preview re-renders after an edit."
+        },
+        "latex-view.margins.default.top": {
+          "type": "string",
+          "default": "1in",
+          "description": "Default top margin for new documents."
+        },
+        "latex-view.margins.default.bottom": {
+          "type": "string",
+          "default": "1in",
+          "description": "Default bottom margin for new documents."
+        },
+        "latex-view.margins.default.left": {
+          "type": "string",
+          "default": "1in",
+          "description": "Default left margin for new documents."
+        },
+        "latex-view.margins.default.right": {
+          "type": "string",
+          "default": "1in",
+          "description": "Default right margin for new documents."
+        },
+        "latex-view.margins.default.paperSize": {
+          "type": "string",
+          "enum": [
+            "a4paper",
+            "letterpaper",
+            "legalpaper"
+          ],
+          "default": "a4paper",
+          "description": "Default paper size for new documents."
+        },
+        "latex-view.wasm.engine": {
+          "type": "string",
+          "enum": [
+            "pdftex",
+            "xetex"
+          ],
+          "default": "pdftex",
+          "description": "Which bundled WASM engine to use when the WASM PDF backend is active."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "node esbuild.js --production",
+    "check-types": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.webview.json",
+    "lint": "eslint src webview-ui",
+    "test:unit": "vitest run",
+    "test:integration": "vscode-test",
+    "vsce:package": "vsce package",
+    "vsce:publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-electron": "^2.4.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.9.0",
+    "katex": "^0.16.11",
+    "latex.js": "^0.12.6",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^2.0.0"
+  }
+}
